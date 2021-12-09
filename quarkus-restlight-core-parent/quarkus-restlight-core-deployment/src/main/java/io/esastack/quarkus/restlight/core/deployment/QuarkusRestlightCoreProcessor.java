@@ -30,8 +30,10 @@ import io.esastack.restlight.core.spi.impl.ResponseEntityWriterFilterFactory;
 import io.esastack.restlight.server.spi.impl.RouteFailureExceptionHandler;
 import io.quarkus.deployment.annotations.BuildStep;
 import io.quarkus.deployment.builditem.FeatureBuildItem;
+import io.quarkus.deployment.builditem.nativeimage.NativeImageResourceBuildItem;
 import io.quarkus.deployment.builditem.nativeimage.ReflectiveClassBuildItem;
 import io.quarkus.deployment.builditem.nativeimage.RuntimeInitializedClassBuildItem;
+import io.quarkus.deployment.builditem.nativeimage.RuntimeInitializedPackageBuildItem;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -43,6 +45,24 @@ class QuarkusRestlightCoreProcessor {
     @BuildStep
     FeatureBuildItem feature() {
         return new FeatureBuildItem(FEATURE);
+    }
+
+    @BuildStep
+    List<NativeImageResourceBuildItem> nativeImageResourceBuildItems() {
+        List<NativeImageResourceBuildItem> resources = new LinkedList<>();
+        resources.add(new NativeImageResourceBuildItem(
+                "META-INF/native-image/io.esastack/commons-net-netty/resource-config.json"));
+
+        resources.add(new NativeImageResourceBuildItem(
+                "META-INF/native-image/io.esastack/restlight-common/resource-config.json"));
+
+        resources.add(new NativeImageResourceBuildItem(
+                "META-INF/native-image/io.esastack/restlight-core/resource-config.json"));
+
+        resources.add(new NativeImageResourceBuildItem(
+                "META-INF/native-image/io.esastack/restlight-server/resource-config.json"));
+
+        return resources;
     }
 
     @BuildStep
@@ -137,5 +157,4 @@ class QuarkusRestlightCoreProcessor {
 
         return runtimeInitializedClasses;
     }
-
 }

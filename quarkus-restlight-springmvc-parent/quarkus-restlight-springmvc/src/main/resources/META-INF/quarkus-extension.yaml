@@ -1,9 +1,7 @@
-name: Quarkus Restlight
-#description: Quarkus Restlight ...
+name: Quarkus Restlight::SpringMVC
 metadata:
-#  keywords:
-#    - quarkus-restlight
-#  guide: ...
-#  categories:
-#    - "miscellaneous"
-#  status: "preview"
+  keywords:
+    - "quarkus-restlight-springmvc"
+  categories:
+    - "SpringMvc"
+  status: "preview"

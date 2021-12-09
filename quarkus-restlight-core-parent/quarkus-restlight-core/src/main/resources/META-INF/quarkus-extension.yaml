@@ -1,9 +1,8 @@
-name: Quarkus Restlight
-#description: Quarkus Restlight ...
+name: Quarkus Restlight::Core
 metadata:
-#  keywords:
-#    - quarkus-restlight
-#  guide: ...
-#  categories:
-#    - "miscellaneous"
-#  status: "preview"
+  keywords:
+    - "quarkus-restlight-core"
+  categories:
+    - "netty"
+    - "rest web service"
+  status: "preview"

@@ -10,6 +10,7 @@
     </parent>
     <artifactId>quarkus-restlight-springmvc-deployment</artifactId>
     <name>Quarkus Restlight::SpringMvc - Deployment</name>
+
     <dependencies>
         <dependency>
             <groupId>io.quarkus</groupId>

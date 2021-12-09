@@ -1,15 +1,33 @@
 package io.esastack.quarkus.restlight.jaxrs.deployment;
 
+import io.esastack.restlight.jaxrs.resolver.param.AsyncResponseParamResolver;
+import io.esastack.restlight.jaxrs.resolver.param.CookieValueParamResolver;
+import io.esastack.restlight.jaxrs.resolver.param.DefaultValueParamResolver;
+import io.esastack.restlight.jaxrs.resolver.param.FormParamResolver;
+import io.esastack.restlight.jaxrs.resolver.param.HttpHeadersParamResolver;
+import io.esastack.restlight.jaxrs.resolver.param.MatrixVariableParamResolver;
+import io.esastack.restlight.jaxrs.resolver.param.PathParamResolver;
+import io.esastack.restlight.jaxrs.resolver.param.QueryParamResolver;
+import io.esastack.restlight.jaxrs.resolver.param.RequestHeaderParamResolver;
+import io.esastack.restlight.jaxrs.resolver.param.RequestParamResolver;
+import io.esastack.restlight.jaxrs.resolver.param.SecurityContextParamResolver;
+import io.esastack.restlight.jaxrs.resolver.param.UriInfoParamResolver;
 import io.esastack.restlight.jaxrs.resolver.reqentity.FixedRequestEntityResolverFactoryImpl;
+import io.esastack.restlight.jaxrs.resolver.rspentity.FixedResponseEntityResolverFactory;
+import io.esastack.restlight.jaxrs.spi.AsyncResponseTransferFactory;
+import io.esastack.restlight.jaxrs.spi.BeanParamResolverProvider;
 import io.esastack.restlight.jaxrs.spi.FlexibleRequestEntityResolverProvider;
 import io.esastack.restlight.jaxrs.spi.FlexibleResponseEntityResolverProvider;
 import io.esastack.restlight.jaxrs.spi.JaxrsExtensionsHandlerFactory;
+import io.esastack.restlight.jaxrs.spi.JaxrsHandlerFactoryProvider;
 import io.esastack.restlight.jaxrs.spi.JaxrsMappingLocatorFactory;
+import io.esastack.restlight.jaxrs.spi.JaxrsResolvableParamPredicate;
 import io.esastack.restlight.jaxrs.spi.JaxrsResponseAdapterFactory;
 import io.esastack.restlight.jaxrs.spi.JaxrsRouteMethodLocatorFactory;
 import io.esastack.restlight.jaxrs.spi.RouteTrackingFilterFactory;
 import io.quarkus.deployment.annotations.BuildStep;
 import io.quarkus.deployment.builditem.FeatureBuildItem;
+import io.quarkus.deployment.builditem.nativeimage.NativeImageResourceBuildItem;
 import io.quarkus.deployment.builditem.nativeimage.ReflectiveClassBuildItem;
 
 import java.util.LinkedList;
@@ -22,6 +40,14 @@ class QuarkusRestlightJaxrsProcessor {
     @BuildStep
     FeatureBuildItem feature() {
         return new FeatureBuildItem(FEATURE);
+    }
+
+    @BuildStep
+    List<NativeImageResourceBuildItem> nativeImageResourceBuildItems() {
+        List<NativeImageResourceBuildItem> resources = new LinkedList<>();
+        resources.add(new NativeImageResourceBuildItem(
+                "META-INF/native-image/io.esastack/restlight-jaxrs-provider/resource-config.json"));
+        return resources;
     }
 
     @BuildStep
@@ -43,6 +69,44 @@ class QuarkusRestlightJaxrsProcessor {
                 JaxrsRouteMethodLocatorFactory.class));
         reflections.add(new ReflectiveClassBuildItem(false, false,
                 RouteTrackingFilterFactory.class));
+        reflections.add(new ReflectiveClassBuildItem(false, false,
+                AsyncResponseTransferFactory.class));
+        reflections.add(new ReflectiveClassBuildItem(false, false,
+                CookieValueParamResolver.class));
+        reflections.add(new ReflectiveClassBuildItem(false, false,
+                DefaultValueParamResolver.class));
+        reflections.add(new ReflectiveClassBuildItem(false, false,
+                FormParamResolver.class));
+
+        reflections.add(new ReflectiveClassBuildItem(false, false,
+                RequestHeaderParamResolver.class));
+        reflections.add(new ReflectiveClassBuildItem(false, false,
+                MatrixVariableParamResolver.class));
+        reflections.add(new ReflectiveClassBuildItem(false, false,
+                PathParamResolver.class));
+        reflections.add(new ReflectiveClassBuildItem(false, false,
+                QueryParamResolver.class));
+
+        reflections.add(new ReflectiveClassBuildItem(false, false,
+                HttpHeadersParamResolver.class));
+        reflections.add(new ReflectiveClassBuildItem(false, false,
+                SecurityContextParamResolver.class));
+        reflections.add(new ReflectiveClassBuildItem(false, false,
+                RequestParamResolver.class));
+        reflections.add(new ReflectiveClassBuildItem(false, false,
+                UriInfoParamResolver.class));
+
+        reflections.add(new ReflectiveClassBuildItem(false, false,
+                AsyncResponseParamResolver.class));
+        reflections.add(new ReflectiveClassBuildItem(false, false,
+                JaxrsHandlerFactoryProvider.class));
+        reflections.add(new ReflectiveClassBuildItem(false, false,
+                JaxrsResolvableParamPredicate.class));
+
+        reflections.add(new ReflectiveClassBuildItem(false, false,
+                FixedResponseEntityResolverFactory.class));
+        reflections.add(new ReflectiveClassBuildItem(false, false,
+                BeanParamResolverProvider.class));
 
         return reflections;
     }
