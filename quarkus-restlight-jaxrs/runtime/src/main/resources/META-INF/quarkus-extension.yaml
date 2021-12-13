@@ -1,0 +1,7 @@
+name: Quarkus Restlight::JAXRS
+metadata:
+  keywords:
+    - "quarkus-restlight-jaxrs"
+  categories:
+    - "JAX-RS"
+  status: "experimental"

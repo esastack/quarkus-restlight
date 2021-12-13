@@ -1,0 +1,8 @@
+name: Quarkus Restlight::Core
+metadata:
+  keywords:
+    - "quarkus-restlight-core"
+  categories:
+    - "netty"
+    - "rest web service"
+  status: "experimental"
