@@ -1,0 +1,7 @@
+name: Quarkus Restlight::SpringMVC
+metadata:
+  keywords:
+    - "quarkus-restlight-springmvc"
+  categories:
+    - "SpringMvc"
+  status: "experimental"
