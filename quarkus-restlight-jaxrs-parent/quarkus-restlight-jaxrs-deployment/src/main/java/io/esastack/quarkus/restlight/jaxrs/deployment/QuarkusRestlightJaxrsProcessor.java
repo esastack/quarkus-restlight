@@ -29,6 +29,7 @@ import io.quarkus.deployment.annotations.BuildStep;
 import io.quarkus.deployment.builditem.FeatureBuildItem;
 import io.quarkus.deployment.builditem.nativeimage.NativeImageResourceBuildItem;
 import io.quarkus.deployment.builditem.nativeimage.ReflectiveClassBuildItem;
+import io.quarkus.deployment.pkg.builditem.UberJarMergedResourceBuildItem;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -40,6 +41,48 @@ class QuarkusRestlightJaxrsProcessor {
     @BuildStep
     FeatureBuildItem feature() {
         return new FeatureBuildItem(FEATURE);
+    }
+
+    @BuildStep
+    List<UberJarMergedResourceBuildItem> mergedResources() {
+        List<UberJarMergedResourceBuildItem> mergedResources = new LinkedList<>();
+        mergedResources.add(new UberJarMergedResourceBuildItem("META-INF/esa" +
+                "/io.esastack.restlight.core.resolver.ParamResolverFactory"));
+        mergedResources.add(new UberJarMergedResourceBuildItem("META-INF/esa" +
+                "/io.esastack.restlight.core.resolver.RequestEntityResolverFactory"));
+        mergedResources.add(new UberJarMergedResourceBuildItem("META-INF/esa" +
+                "/io.esastack.restlight.core.resolver.ResponseEntityResolverAdviceFactory"));
+        mergedResources.add(new UberJarMergedResourceBuildItem("META-INF/esa" +
+                "/io.esastack.restlight.core.resolver.ResponseEntityResolverFactory"));
+
+        mergedResources.add(new UberJarMergedResourceBuildItem("META-INF/esa" +
+                "/io.esastack.restlight.core.spi.ParamResolverProvider"));
+        mergedResources.add(new UberJarMergedResourceBuildItem("META-INF/esa" +
+                "/io.esastack.restlight.core.spi.RequestEntityResolverProvider"));
+        mergedResources.add(new UberJarMergedResourceBuildItem("META-INF/esa" +
+                "/io.esastack.restlight.core.spi.ResponseEntityResolverProvider"));
+        mergedResources.add(new UberJarMergedResourceBuildItem("META-INF/esa" +
+                "/io.esastack.restlight.core.spi.RouteFilterFactory"));
+
+
+        mergedResources.add(new UberJarMergedResourceBuildItem("META-INF/esa" +
+                "/internal/io.esastack.restlight.core.method.ResolvableParamPredicate"));
+        mergedResources.add(new UberJarMergedResourceBuildItem("META-INF/esa" +
+                "/internal/io.esastack.restlight.core.spi.ExtensionsHandlerFactory"));
+        mergedResources.add(new UberJarMergedResourceBuildItem("META-INF/esa" +
+                "/internal/io.esastack.restlight.core.spi.FutureTransferFactory"));
+        mergedResources.add(new UberJarMergedResourceBuildItem("META-INF/esa" +
+                "/internal/io.esastack.restlight.core.spi.HandlerFactoryProvider"));
+        mergedResources.add(new UberJarMergedResourceBuildItem("META-INF/esa" +
+                "/internal/io.esastack.restlight.core.spi.MappingLocatorFactory"));
+        mergedResources.add(new UberJarMergedResourceBuildItem("META-INF/esa" +
+                "/internal/io.esastack.restlight.core.spi.RouteMethodLocatorFactory"));
+        mergedResources.add(new UberJarMergedResourceBuildItem("META-INF/esa" +
+                "/internal/io.esastack.restlight.spring.spi.ControllerLocator"));
+        mergedResources.add(new UberJarMergedResourceBuildItem("META-INF/esa" +
+                "/internal/io.esastack.restlight.spring.spi.ExtensionLocator"));
+
+        return mergedResources;
     }
 
     @BuildStep
