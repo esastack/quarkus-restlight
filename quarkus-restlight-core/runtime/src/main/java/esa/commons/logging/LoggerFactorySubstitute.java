@@ -19,7 +19,7 @@ import com.oracle.svm.core.annotate.Substitute;
 import com.oracle.svm.core.annotate.TargetClass;
 
 @TargetClass(className = "esa.commons.logging.LoggerFactory")
-final class Target_esa_commons_logging_LoggerFactory {
+public final class LoggerFactorySubstitute {
 
     @Substitute
     private static LoggerDelegateFactory init() {
@@ -27,6 +27,9 @@ final class Target_esa_commons_logging_LoggerFactory {
         logger.create(LoggerFactory.class.getName()).debug("Using jdk logger as the logging framework.");
 
         return logger;
+    }
+
+    LoggerFactorySubstitute() {
     }
 
 }

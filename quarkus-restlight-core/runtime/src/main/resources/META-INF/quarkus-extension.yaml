@@ -5,4 +5,4 @@ metadata:
   categories:
     - "netty"
     - "rest web service"
-  status: "preview"
+  status: "experimental"

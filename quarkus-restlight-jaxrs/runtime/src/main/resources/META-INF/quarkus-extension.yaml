@@ -4,4 +4,4 @@ metadata:
     - "quarkus-restlight-jaxrs"
   categories:
     - "JAX-RS"
-  status: "preview"
+  status: "experimental"

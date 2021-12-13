@@ -4,4 +4,4 @@ metadata:
     - "quarkus-restlight-springmvc"
   categories:
     - "SpringMvc"
-  status: "preview"
+  status: "experimental"
