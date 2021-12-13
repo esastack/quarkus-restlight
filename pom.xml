@@ -9,9 +9,9 @@
     <packaging>pom</packaging>
     <name>Quarkus Restlight - Parent</name>
     <modules>
-        <module>quarkus-restlight-core-parent</module>
-        <module>quarkus-restlight-jaxrs-parent</module>
-        <module>quarkus-restlight-springmvc-parent</module>
+        <module>quarkus-restlight-core</module>
+        <module>quarkus-restlight-jaxrs</module>
+        <module>quarkus-restlight-springmvc</module>
     </modules>
 
     <properties>

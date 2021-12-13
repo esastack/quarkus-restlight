@@ -14,7 +14,7 @@
     <artifactId>quarkus-restlight-springmvc-parent</artifactId>
 
     <modules>
-        <module>quarkus-restlight-springmvc-deployment</module>
-        <module>quarkus-restlight-springmvc</module>
+        <module>deployment</module>
+        <module>runtime</module>
     </modules>
 </project>
