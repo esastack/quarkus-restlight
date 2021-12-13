@@ -21,14 +21,10 @@
     <parent>
         <groupId>io.esastack</groupId>
         <artifactId>quarkus-restlight-jaxrs-parent</artifactId>
-        <version>1.0.0-SNAPSHOT</version>
+        <version>0.0.1-SNAPSHOT</version>
     </parent>
     <artifactId>quarkus-restlight-jaxrs</artifactId>
     <name>Quarkus Restlight::JaxRs - Runtime</name>
-
-    <properties>
-        <restlight.version>1.0.0-SNAPSHOT</restlight.version>
-    </properties>
 
     <dependencies>
         <dependency>

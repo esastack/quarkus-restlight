@@ -20,7 +20,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.esastack</groupId>
     <artifactId>quarkus-restlight-parent</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>0.0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Quarkus Restlight - Parent</name>
 
@@ -115,6 +115,7 @@
         <quarkus.version>2.5.1.Final</quarkus.version>
         <surefire-plugin.version>3.0.0-M5</surefire-plugin.version>
         <esa-commons-build.version>1.0</esa-commons-build.version>
+        <restlight.version>1.0.0-SNAPSHOT</restlight.version>
     </properties>
 
     <dependencyManagement>
