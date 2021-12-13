@@ -17,6 +17,10 @@
             <artifactId>quarkus-arc-deployment</artifactId>
         </dependency>
         <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-netty-deployment</artifactId>
+        </dependency>
+        <dependency>
             <groupId>io.esastack</groupId>
             <artifactId>quarkus-restlight-core</artifactId>
             <version>${project.version}</version>
