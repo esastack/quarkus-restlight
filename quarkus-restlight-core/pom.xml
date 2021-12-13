@@ -20,7 +20,7 @@
     <parent>
         <artifactId>quarkus-restlight-parent</artifactId>
         <groupId>io.esastack</groupId>
-        <version>1.0.0-SNAPSHOT</version>
+        <version>0.0.1-SNAPSHOT</version>
     </parent>
     <name>Quarkus Restlight::Core - Parent</name>
     <modelVersion>4.0.0</modelVersion>
