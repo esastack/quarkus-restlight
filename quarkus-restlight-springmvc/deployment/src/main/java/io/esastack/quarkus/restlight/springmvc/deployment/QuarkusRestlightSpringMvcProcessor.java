@@ -16,11 +16,11 @@
 package io.esastack.quarkus.restlight.springmvc.deployment;
 
 import io.esastack.restlight.springmvc.reqentity.FixedRequestEntityResolverFactoryImpl;
-import io.esastack.restlight.springmvc.resolver.param.CookieValueParamResolver;
+import io.esastack.restlight.springmvc.resolver.param.CookieValueResolver;
 import io.esastack.restlight.springmvc.resolver.param.MatrixVariableParamResolver;
 import io.esastack.restlight.springmvc.resolver.param.PathVariableParamResolver;
 import io.esastack.restlight.springmvc.resolver.param.RequestAttributeParamResolver;
-import io.esastack.restlight.springmvc.resolver.param.RequestHeaderParamResolver;
+import io.esastack.restlight.springmvc.resolver.param.RequestHeaderResolver;
 import io.esastack.restlight.springmvc.resolver.param.RequestParamResolver;
 import io.esastack.restlight.springmvc.resolver.rspentity.FixedResponseEntityResolverFactory;
 import io.esastack.restlight.springmvc.resolver.rspentity.ResponseStatusEntityResolverFactory;
@@ -94,7 +94,7 @@ class QuarkusRestlightSpringMvcProcessor {
         reflections.add(new ReflectiveClassBuildItem(false, false,
                 SpringMvcRouteMethodLocatorFactory.class));
         reflections.add(new ReflectiveClassBuildItem(false, false,
-                CookieValueParamResolver.class));
+                CookieValueResolver.class));
         reflections.add(new ReflectiveClassBuildItem(false, false,
                 MatrixVariableParamResolver.class));
 
@@ -103,7 +103,7 @@ class QuarkusRestlightSpringMvcProcessor {
         reflections.add(new ReflectiveClassBuildItem(false, false,
                 RequestAttributeParamResolver.class));
         reflections.add(new ReflectiveClassBuildItem(false, false,
-                RequestHeaderParamResolver.class));
+                RequestHeaderResolver.class));
         reflections.add(new ReflectiveClassBuildItem(false, false,
                 RequestParamResolver.class));
 

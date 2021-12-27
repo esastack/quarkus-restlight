@@ -16,14 +16,14 @@
 package io.esastack.quarkus.restlight.jaxrs.deployment;
 
 import io.esastack.restlight.jaxrs.resolver.param.AsyncResponseParamResolver;
-import io.esastack.restlight.jaxrs.resolver.param.CookieValueParamResolver;
+import io.esastack.restlight.jaxrs.resolver.param.CookieValueResolver;
 import io.esastack.restlight.jaxrs.resolver.param.DefaultValueParamResolver;
 import io.esastack.restlight.jaxrs.resolver.param.FormParamResolver;
 import io.esastack.restlight.jaxrs.resolver.param.HttpHeadersParamResolver;
 import io.esastack.restlight.jaxrs.resolver.param.MatrixVariableParamResolver;
 import io.esastack.restlight.jaxrs.resolver.param.PathParamResolver;
 import io.esastack.restlight.jaxrs.resolver.param.QueryParamResolver;
-import io.esastack.restlight.jaxrs.resolver.param.RequestHeaderParamResolver;
+import io.esastack.restlight.jaxrs.resolver.param.RequestHeaderResolver;
 import io.esastack.restlight.jaxrs.resolver.param.RequestParamResolver;
 import io.esastack.restlight.jaxrs.resolver.param.SecurityContextParamResolver;
 import io.esastack.restlight.jaxrs.resolver.param.UriInfoParamResolver;
@@ -130,14 +130,14 @@ class QuarkusRestlightJaxrsProcessor {
         reflections.add(new ReflectiveClassBuildItem(false, false,
                 AsyncResponseTransferFactory.class));
         reflections.add(new ReflectiveClassBuildItem(false, false,
-                CookieValueParamResolver.class));
+                CookieValueResolver.class));
         reflections.add(new ReflectiveClassBuildItem(false, false,
                 DefaultValueParamResolver.class));
         reflections.add(new ReflectiveClassBuildItem(false, false,
                 FormParamResolver.class));
 
         reflections.add(new ReflectiveClassBuildItem(false, false,
-                RequestHeaderParamResolver.class));
+                RequestHeaderResolver.class));
         reflections.add(new ReflectiveClassBuildItem(false, false,
                 MatrixVariableParamResolver.class));
         reflections.add(new ReflectiveClassBuildItem(false, false,
