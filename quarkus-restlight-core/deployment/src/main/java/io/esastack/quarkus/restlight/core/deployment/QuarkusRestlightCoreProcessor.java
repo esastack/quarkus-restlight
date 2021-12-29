@@ -42,7 +42,7 @@ import io.esastack.restlight.core.spi.impl.ListenableFutureTransferFactory;
 import io.esastack.restlight.core.spi.impl.QueryBeanParamResolverProvider;
 import io.esastack.restlight.core.spi.impl.RequestBeanParamResolverProvider;
 import io.esastack.restlight.core.spi.impl.ResponseEntityWriterFilterFactory;
-import io.esastack.restlight.server.spi.impl.RouteFailureExceptionHandler;
+import io.esastack.restlight.server.spi.impl.RouteFailureExceptionHandlerFactory;
 import io.quarkus.deployment.annotations.BuildStep;
 import io.quarkus.deployment.builditem.FeatureBuildItem;
 import io.quarkus.deployment.builditem.nativeimage.NativeImageResourceBuildItem;
@@ -127,7 +127,7 @@ class QuarkusRestlightCoreProcessor {
                 "io.esastack.httpserver.impl.RequestDecoder"));
 
         // reflection-configs from restlight-server.
-        reflections.add(new ReflectiveClassBuildItem(false, false, RouteFailureExceptionHandler.class));
+        reflections.add(new ReflectiveClassBuildItem(false, false, RouteFailureExceptionHandlerFactory.class));
 
         // reflection-configs from restlight-core.
         reflections.add(new ReflectiveClassBuildItem(false, false, Java7HandlersImpl.class));
