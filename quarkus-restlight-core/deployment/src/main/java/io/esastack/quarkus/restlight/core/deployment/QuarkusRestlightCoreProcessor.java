@@ -24,6 +24,8 @@ import io.esastack.commons.net.netty.buffer.NettyBufferProvider;
 import io.esastack.commons.net.netty.buffer.UnpooledNettyBufferAllocator;
 import io.esastack.commons.net.netty.http.NettyCookieProvider;
 import io.esastack.httpserver.transport.NioTransport;
+import io.esastack.quarkus.restlight.commons.SpiUtil;
+import io.esastack.restlight.core.Restlight;
 import io.esastack.restlight.core.method.DefaultResolvableParamPredicate;
 import io.esastack.restlight.core.resolver.param.HttpRequestParamResolverFactory;
 import io.esastack.restlight.core.resolver.param.HttpResponseParamResolverFactory;
@@ -31,6 +33,7 @@ import io.esastack.restlight.core.resolver.rspentity.ByteArrayEntityResolverFact
 import io.esastack.restlight.core.resolver.rspentity.ByteBufEntityResolverFactory;
 import io.esastack.restlight.core.resolver.rspentity.CharSequenceEntityResolverFactory;
 import io.esastack.restlight.core.resolver.rspentity.PrimitiveEntityResolverFactory;
+import io.esastack.restlight.core.serialize.JacksonSerializer;
 import io.esastack.restlight.core.spi.impl.CompletableFutureTransferFactory;
 import io.esastack.restlight.core.spi.impl.DefaultFutureTransferFactory;
 import io.esastack.restlight.core.spi.impl.HandlerFactoryProviderImpl;
@@ -42,6 +45,7 @@ import io.esastack.restlight.core.spi.impl.ListenableFutureTransferFactory;
 import io.esastack.restlight.core.spi.impl.QueryBeanParamResolverProvider;
 import io.esastack.restlight.core.spi.impl.RequestBeanParamResolverProvider;
 import io.esastack.restlight.core.spi.impl.ResponseEntityWriterFilterFactory;
+import io.esastack.restlight.server.Restlite;
 import io.esastack.restlight.server.spi.impl.RouteFailureExceptionHandlerFactory;
 import io.quarkus.deployment.annotations.BuildStep;
 import io.quarkus.deployment.builditem.FeatureBuildItem;
@@ -50,12 +54,18 @@ import io.quarkus.deployment.builditem.nativeimage.ReflectiveClassBuildItem;
 import io.quarkus.deployment.builditem.nativeimage.RuntimeInitializedClassBuildItem;
 import io.quarkus.deployment.pkg.builditem.UberJarMergedResourceBuildItem;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.jar.JarFile;
 
 class QuarkusRestlightCoreProcessor {
 
     private static final String FEATURE = "quarkus-restlight-core";
+    private static final String ESA_SPI_DIR_PATH = "META-INF/esa";
+    private static final String ESA_INTERNAL_SPI_DIR_PATH = "META-INF/esa/internal";
 
     @BuildStep
     FeatureBuildItem feature() {
@@ -63,29 +73,12 @@ class QuarkusRestlightCoreProcessor {
     }
 
     @BuildStep
-    List<UberJarMergedResourceBuildItem> mergedResources() {
+    List<UberJarMergedResourceBuildItem> mergedResources() throws IOException {
         List<UberJarMergedResourceBuildItem> mergedResources = new LinkedList<>();
-        mergedResources.add(new UberJarMergedResourceBuildItem("META-INF/esa" +
-                "/io.esastack.restlight.core.resolver.ParamResolverFactory"));
-        mergedResources.add(new UberJarMergedResourceBuildItem("META-INF/esa" +
-                "/io.esastack.restlight.core.resolver.ResponseEntityResolverFactory"));
-        mergedResources.add(new UberJarMergedResourceBuildItem("META-INF/esa" +
-                "/io.esastack.restlight.core.spi.FilterFactory"));
-        mergedResources.add(new UberJarMergedResourceBuildItem("META-INF/esa" +
-                "/io.esastack.restlight.core.spi.ParamResolverProvider"));
-
-
-        mergedResources.add(new UberJarMergedResourceBuildItem("META-INF/esa" +
-                "/internal/io.esastack.restlight.core.method.ResolvableParamPredicate"));
-        mergedResources.add(new UberJarMergedResourceBuildItem("META-INF/esa" +
-                "/internal/io.esastack.restlight.core.spi.DefaultSerializerFactory"));
-        mergedResources.add(new UberJarMergedResourceBuildItem("META-INF/esa" +
-                "/internal/io.esastack.restlight.core.spi.FutureTransferFactory"));
-        mergedResources.add(new UberJarMergedResourceBuildItem("META-INF/esa" +
-                "/internal/io.esastack.restlight.core.spi.HandlerFactoryProvider"));
-        mergedResources.add(new UberJarMergedResourceBuildItem("META-INF/esa" +
-                "/internal/io.esastack.restlight.core.spi.HandlerValueResolverLocatorFactory"));
-
+        List<String> spiPaths = SpiUtil.getAllSpiPaths(Restlight.class);
+        for (String spiPath : spiPaths) {
+            mergedResources.add(new UberJarMergedResourceBuildItem(spiPath));
+        }
         return mergedResources;
     }
 
@@ -108,7 +101,7 @@ class QuarkusRestlightCoreProcessor {
     }
 
     @BuildStep
-    List<ReflectiveClassBuildItem> reflections() {
+    List<ReflectiveClassBuildItem> reflections() throws IOException {
         List<ReflectiveClassBuildItem> reflections = new LinkedList<>();
 
         // reflection-configs from commons-net-netty.
@@ -127,9 +120,17 @@ class QuarkusRestlightCoreProcessor {
                 "io.esastack.httpserver.impl.RequestDecoder"));
 
         // reflection-configs from restlight-server.
+        final JarFile restlightServerJar = new JarFile(Restlite.class.getProtectionDomain().getCodeSource().getLocation().getPath());
+        InputStream reflectionStream = restlightServerJar.getInputStream(restlightServerJar.getEntry("META-INF/native-image/io.esastack/restlight-server/reflection-config.json"));
+        new JacksonSerializer().deserialize(reflectionStream.readAllBytes(), );
+
         reflections.add(new ReflectiveClassBuildItem(false, false, RouteFailureExceptionHandlerFactory.class));
 
         // reflection-configs from restlight-core.
+        final File jarFile = new File(Restlight.class.getProtectionDomain().getCodeSource().getLocation().getPath());
+
+        final JarFile jar = new JarFile(jarFile);
+
         reflections.add(new ReflectiveClassBuildItem(false, false, Java7HandlersImpl.class));
         reflections.add(new ReflectiveClassBuildItem(false, false, Java7SupportImpl.class));
         reflections.add(new ReflectiveClassBuildItem(false, false,

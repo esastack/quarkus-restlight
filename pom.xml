@@ -99,6 +99,7 @@
         <module>quarkus-restlight-core</module>
         <module>quarkus-restlight-jaxrs</module>
         <module>quarkus-restlight-springmvc</module>
+        <module>quarkus-restlight-commons</module>
     </modules>
 
     <properties>
