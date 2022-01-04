@@ -15,33 +15,27 @@
  */
 package io.esastack.quarkus.restlight.springmvc.deployment;
 
-import io.esastack.restlight.springmvc.reqentity.FixedRequestEntityResolverFactoryImpl;
-import io.esastack.restlight.springmvc.resolver.param.CookieValueResolver;
-import io.esastack.restlight.springmvc.resolver.param.MatrixVariableParamResolver;
-import io.esastack.restlight.springmvc.resolver.param.PathVariableParamResolver;
-import io.esastack.restlight.springmvc.resolver.param.RequestAttributeParamResolver;
-import io.esastack.restlight.springmvc.resolver.param.RequestHeaderResolver;
-import io.esastack.restlight.springmvc.resolver.param.RequestParamResolver;
-import io.esastack.restlight.springmvc.resolver.rspentity.FixedResponseEntityResolverFactory;
-import io.esastack.restlight.springmvc.resolver.rspentity.ResponseStatusEntityResolverFactory;
-import io.esastack.restlight.springmvc.spi.FlexibleRequestEntityResolverProvider;
-import io.esastack.restlight.springmvc.spi.FlexibleResponseEntityResolverProvider;
-import io.esastack.restlight.springmvc.spi.SpringMvcExceptionResolverFactoryProvider;
-import io.esastack.restlight.springmvc.spi.SpringMvcMappingLocatorFactory;
-import io.esastack.restlight.springmvc.spi.SpringMvcRouteMethodLocatorFactory;
-import io.esastack.restlight.springmvc.spi.core.SpringMvcExceptionHandlerFactory;
+import esa.commons.logging.Logger;
+import esa.commons.logging.LoggerFactory;
+import io.esastack.quarkus.restlight.commons.ReflectedClassInfo;
+import io.esastack.quarkus.restlight.commons.ReflectionInfoUtil;
+import io.esastack.quarkus.restlight.commons.SpiUtil;
+import io.esastack.restlight.server.Restlite;
+import io.esastack.restlight.springmvc.resolver.exception.SpringMvcExceptionResolverFactory;
 import io.quarkus.deployment.annotations.BuildStep;
 import io.quarkus.deployment.builditem.FeatureBuildItem;
 import io.quarkus.deployment.builditem.nativeimage.NativeImageResourceBuildItem;
 import io.quarkus.deployment.builditem.nativeimage.ReflectiveClassBuildItem;
 import io.quarkus.deployment.pkg.builditem.UberJarMergedResourceBuildItem;
 
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
 class QuarkusRestlightSpringMvcProcessor {
 
     private static final String FEATURE = "quarkus-restlight-springmvc";
+    private static final Logger LOGGER = LoggerFactory.getLogger(QuarkusRestlightSpringMvcProcessor.class);
 
     @BuildStep
     FeatureBuildItem feature() {
@@ -49,32 +43,13 @@ class QuarkusRestlightSpringMvcProcessor {
     }
 
     @BuildStep
-    List<UberJarMergedResourceBuildItem> mergedResources() {
+    List<UberJarMergedResourceBuildItem> mergedResources() throws IOException {
         List<UberJarMergedResourceBuildItem> mergedResources = new LinkedList<>();
-        mergedResources.add(new UberJarMergedResourceBuildItem("META-INF/esa" +
-                "/io.esastack.restlight.core.resolver.ParamResolverFactory"));
-        mergedResources.add(new UberJarMergedResourceBuildItem("META-INF/esa" +
-                "/io.esastack.restlight.core.resolver.RequestEntityResolverFactory"));
-        mergedResources.add(new UberJarMergedResourceBuildItem("META-INF/esa" +
-                "/io.esastack.restlight.core.resolver.ResponseEntityResolverFactory"));
-        mergedResources.add(new UberJarMergedResourceBuildItem("META-INF/esa" +
-                "/io.esastack.restlight.core.spi.ExceptionHandlerFactory"));
-        mergedResources.add(new UberJarMergedResourceBuildItem("META-INF/esa" +
-                "/io.esastack.restlight.core.spi.RequestEntityResolverProvider"));
-        mergedResources.add(new UberJarMergedResourceBuildItem("META-INF/esa" +
-                "/io.esastack.restlight.core.spi.ResponseEntityResolverProvider"));
-
-        mergedResources.add(new UberJarMergedResourceBuildItem("META-INF/esa" +
-                "/internal/io.esastack.restlight.core.spi.ExceptionResolverFactoryProvider"));
-        mergedResources.add(new UberJarMergedResourceBuildItem("META-INF/esa" +
-                "/internal/io.esastack.restlight.core.spi.MappingLocatorFactory"));
-        mergedResources.add(new UberJarMergedResourceBuildItem("META-INF/esa" +
-                "/internal/io.esastack.restlight.core.spi.RouteMethodLocatorFactory"));
-        mergedResources.add(new UberJarMergedResourceBuildItem("META-INF/esa" +
-                "/internal/io.esastack.restlight.spring.spi.AdviceLocator"));
-        mergedResources.add(new UberJarMergedResourceBuildItem("META-INF/esa" +
-                "/internal/io.esastack.restlight.spring.spi.ControllerLocator"));
-
+        List<String> spiPaths = SpiUtil.getAllSpiPaths(SpringMvcExceptionResolverFactory.class);
+        for (String spiPath : spiPaths) {
+            LOGGER.info("Add mergedResources:" + spiPath);
+            mergedResources.add(new UberJarMergedResourceBuildItem(spiPath));
+        }
         return mergedResources;
     }
 
@@ -87,41 +62,18 @@ class QuarkusRestlightSpringMvcProcessor {
     }
 
     @BuildStep
-    List<ReflectiveClassBuildItem> reflections() {
+    List<ReflectiveClassBuildItem> reflections() throws ClassNotFoundException, IOException {
         List<ReflectiveClassBuildItem> reflections = new LinkedList<>();
-        reflections.add(new ReflectiveClassBuildItem(false, false,
-                SpringMvcMappingLocatorFactory.class));
-        reflections.add(new ReflectiveClassBuildItem(false, false,
-                SpringMvcRouteMethodLocatorFactory.class));
-        reflections.add(new ReflectiveClassBuildItem(false, false,
-                CookieValueResolver.class));
-        reflections.add(new ReflectiveClassBuildItem(false, false,
-                MatrixVariableParamResolver.class));
-
-        reflections.add(new ReflectiveClassBuildItem(false, false,
-                PathVariableParamResolver.class));
-        reflections.add(new ReflectiveClassBuildItem(false, false,
-                RequestAttributeParamResolver.class));
-        reflections.add(new ReflectiveClassBuildItem(false, false,
-                RequestHeaderResolver.class));
-        reflections.add(new ReflectiveClassBuildItem(false, false,
-                RequestParamResolver.class));
-
-        reflections.add(new ReflectiveClassBuildItem(false, false,
-                FixedRequestEntityResolverFactoryImpl.class));
-        reflections.add(new ReflectiveClassBuildItem(false, false,
-                FixedResponseEntityResolverFactory.class));
-        reflections.add(new ReflectiveClassBuildItem(false, false,
-                ResponseStatusEntityResolverFactory.class));
-        reflections.add(new ReflectiveClassBuildItem(false, false,
-                FlexibleRequestEntityResolverProvider.class));
-
-        reflections.add(new ReflectiveClassBuildItem(false, false,
-                FlexibleResponseEntityResolverProvider.class));
-        reflections.add(new ReflectiveClassBuildItem(false, false,
-                SpringMvcExceptionResolverFactoryProvider.class));
-        reflections.add(new ReflectiveClassBuildItem(false, false,
-                SpringMvcExceptionHandlerFactory.class));
+        List<ReflectedClassInfo> reflectedInfos = ReflectionInfoUtil.getReflectionConfig(Restlite.class,
+                "META-INF/native-image/io.esastack/restlight-jaxrs-provider/" +
+                        "reflection-config.json");
+        for (ReflectedClassInfo reflectedInfo : reflectedInfos) {
+            String className = reflectedInfo.getName();
+            LOGGER.info("Load reflection-info(" + className + ") from restlight-jaxrs-provider.");
+            reflections.add(new ReflectiveClassBuildItem(false,
+                    false,
+                    Class.forName(className)));
+        }
 
         return reflections;
     }

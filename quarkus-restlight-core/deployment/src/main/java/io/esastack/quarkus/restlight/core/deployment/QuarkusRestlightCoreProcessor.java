@@ -15,38 +15,20 @@
  */
 package io.esastack.quarkus.restlight.core.deployment;
 
-import com.fasterxml.jackson.databind.ext.Java7HandlersImpl;
-import com.fasterxml.jackson.databind.ext.Java7SupportImpl;
 import esa.commons.Platforms;
+import esa.commons.logging.Logger;
+import esa.commons.logging.LoggerFactory;
 import io.esastack.commons.net.buffer.BufferUtil;
 import io.esastack.commons.net.netty.buffer.NettyBufferAllocatorImpl;
 import io.esastack.commons.net.netty.buffer.NettyBufferProvider;
 import io.esastack.commons.net.netty.buffer.UnpooledNettyBufferAllocator;
 import io.esastack.commons.net.netty.http.NettyCookieProvider;
 import io.esastack.httpserver.transport.NioTransport;
+import io.esastack.quarkus.restlight.commons.ReflectedClassInfo;
+import io.esastack.quarkus.restlight.commons.ReflectionInfoUtil;
 import io.esastack.quarkus.restlight.commons.SpiUtil;
 import io.esastack.restlight.core.Restlight;
-import io.esastack.restlight.core.method.DefaultResolvableParamPredicate;
-import io.esastack.restlight.core.resolver.param.HttpRequestParamResolverFactory;
-import io.esastack.restlight.core.resolver.param.HttpResponseParamResolverFactory;
-import io.esastack.restlight.core.resolver.rspentity.ByteArrayEntityResolverFactory;
-import io.esastack.restlight.core.resolver.rspentity.ByteBufEntityResolverFactory;
-import io.esastack.restlight.core.resolver.rspentity.CharSequenceEntityResolverFactory;
-import io.esastack.restlight.core.resolver.rspentity.PrimitiveEntityResolverFactory;
-import io.esastack.restlight.core.serialize.JacksonSerializer;
-import io.esastack.restlight.core.spi.impl.CompletableFutureTransferFactory;
-import io.esastack.restlight.core.spi.impl.DefaultFutureTransferFactory;
-import io.esastack.restlight.core.spi.impl.HandlerFactoryProviderImpl;
-import io.esastack.restlight.core.spi.impl.HandlerLocatorResolverFactory;
-import io.esastack.restlight.core.spi.impl.HandlerMethodResolverFactory;
-import io.esastack.restlight.core.spi.impl.HandlersParamResolverProvider;
-import io.esastack.restlight.core.spi.impl.JacksonDefaultSerializerFactory;
-import io.esastack.restlight.core.spi.impl.ListenableFutureTransferFactory;
-import io.esastack.restlight.core.spi.impl.QueryBeanParamResolverProvider;
-import io.esastack.restlight.core.spi.impl.RequestBeanParamResolverProvider;
-import io.esastack.restlight.core.spi.impl.ResponseEntityWriterFilterFactory;
 import io.esastack.restlight.server.Restlite;
-import io.esastack.restlight.server.spi.impl.RouteFailureExceptionHandlerFactory;
 import io.quarkus.deployment.annotations.BuildStep;
 import io.quarkus.deployment.builditem.FeatureBuildItem;
 import io.quarkus.deployment.builditem.nativeimage.NativeImageResourceBuildItem;
@@ -54,18 +36,16 @@ import io.quarkus.deployment.builditem.nativeimage.ReflectiveClassBuildItem;
 import io.quarkus.deployment.builditem.nativeimage.RuntimeInitializedClassBuildItem;
 import io.quarkus.deployment.pkg.builditem.UberJarMergedResourceBuildItem;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.jar.JarFile;
+import java.util.Set;
 
 class QuarkusRestlightCoreProcessor {
 
     private static final String FEATURE = "quarkus-restlight-core";
-    private static final String ESA_SPI_DIR_PATH = "META-INF/esa";
-    private static final String ESA_INTERNAL_SPI_DIR_PATH = "META-INF/esa/internal";
+    private static final Logger LOGGER = LoggerFactory.getLogger(QuarkusRestlightCoreProcessor.class);
 
     @BuildStep
     FeatureBuildItem feature() {
@@ -75,8 +55,11 @@ class QuarkusRestlightCoreProcessor {
     @BuildStep
     List<UberJarMergedResourceBuildItem> mergedResources() throws IOException {
         List<UberJarMergedResourceBuildItem> mergedResources = new LinkedList<>();
-        List<String> spiPaths = SpiUtil.getAllSpiPaths(Restlight.class);
-        for (String spiPath : spiPaths) {
+        Set<String> spiPathSet = new HashSet<>();
+        spiPathSet.addAll(SpiUtil.getAllSpiPaths(Restlite.class));
+        spiPathSet.addAll(SpiUtil.getAllSpiPaths(Restlight.class));
+        for (String spiPath : spiPathSet) {
+            LOGGER.info("Add mergedResources:" + spiPath);
             mergedResources.add(new UberJarMergedResourceBuildItem(spiPath));
         }
         return mergedResources;
@@ -101,7 +84,7 @@ class QuarkusRestlightCoreProcessor {
     }
 
     @BuildStep
-    List<ReflectiveClassBuildItem> reflections() throws IOException {
+    List<ReflectiveClassBuildItem> reflections() throws IOException, ClassNotFoundException {
         List<ReflectiveClassBuildItem> reflections = new LinkedList<>();
 
         // reflection-configs from commons-net-netty.
@@ -120,60 +103,26 @@ class QuarkusRestlightCoreProcessor {
                 "io.esastack.httpserver.impl.RequestDecoder"));
 
         // reflection-configs from restlight-server.
-        final JarFile restlightServerJar = new JarFile(Restlite.class.getProtectionDomain().getCodeSource().getLocation().getPath());
-        InputStream reflectionStream = restlightServerJar.getInputStream(restlightServerJar.getEntry("META-INF/native-image/io.esastack/restlight-server/reflection-config.json"));
-        new JacksonSerializer().deserialize(reflectionStream.readAllBytes(), );
-
-        reflections.add(new ReflectiveClassBuildItem(false, false, RouteFailureExceptionHandlerFactory.class));
+        List<ReflectedClassInfo> reflectedInfos = ReflectionInfoUtil.getReflectionConfig(Restlite.class,
+                "META-INF/native-image/io.esastack/restlight-server/reflection-config.json");
+        for (ReflectedClassInfo reflectedInfo : reflectedInfos) {
+            String className = reflectedInfo.getName();
+            LOGGER.info("Load reflection-info(" + className + ") from restlight-server.");
+            reflections.add(new ReflectiveClassBuildItem(false,
+                    false,
+                    Class.forName(className)));
+        }
 
         // reflection-configs from restlight-core.
-        final File jarFile = new File(Restlight.class.getProtectionDomain().getCodeSource().getLocation().getPath());
-
-        final JarFile jar = new JarFile(jarFile);
-
-        reflections.add(new ReflectiveClassBuildItem(false, false, Java7HandlersImpl.class));
-        reflections.add(new ReflectiveClassBuildItem(false, false, Java7SupportImpl.class));
-        reflections.add(new ReflectiveClassBuildItem(false, false,
-                DefaultResolvableParamPredicate.class));
-        reflections.add(new ReflectiveClassBuildItem(false, false,
-                HttpRequestParamResolverFactory.class));
-        reflections.add(new ReflectiveClassBuildItem(false, false,
-                HttpResponseParamResolverFactory.class));
-
-        reflections.add(new ReflectiveClassBuildItem(false, false,
-                ByteArrayEntityResolverFactory.class));
-        reflections.add(new ReflectiveClassBuildItem(false, false,
-                ByteBufEntityResolverFactory.class));
-        reflections.add(new ReflectiveClassBuildItem(false, false,
-                CharSequenceEntityResolverFactory.class));
-
-        reflections.add(new ReflectiveClassBuildItem(false, false,
-                PrimitiveEntityResolverFactory.class));
-        reflections.add(new ReflectiveClassBuildItem(false, false,
-                CompletableFutureTransferFactory.class));
-        reflections.add(new ReflectiveClassBuildItem(false, false,
-                DefaultFutureTransferFactory.class));
-
-        reflections.add(new ReflectiveClassBuildItem(false, false,
-                HandlerFactoryProviderImpl.class));
-        reflections.add(new ReflectiveClassBuildItem(false, false,
-                HandlerLocatorResolverFactory.class));
-        reflections.add(new ReflectiveClassBuildItem(false, false,
-                HandlerMethodResolverFactory.class));
-
-        reflections.add(new ReflectiveClassBuildItem(false, false,
-                HandlersParamResolverProvider.class));
-        reflections.add(new ReflectiveClassBuildItem(false, false,
-                JacksonDefaultSerializerFactory.class));
-        reflections.add(new ReflectiveClassBuildItem(false, false,
-                ListenableFutureTransferFactory.class));
-
-        reflections.add(new ReflectiveClassBuildItem(false, false,
-                QueryBeanParamResolverProvider.class));
-        reflections.add(new ReflectiveClassBuildItem(false, false,
-                RequestBeanParamResolverProvider.class));
-        reflections.add(new ReflectiveClassBuildItem(false, false,
-                ResponseEntityWriterFilterFactory.class));
+        reflectedInfos = ReflectionInfoUtil.getReflectionConfig(Restlight.class,
+                "META-INF/native-image/io.esastack/restlight-core/reflection-config.json");
+        for (ReflectedClassInfo reflectedInfo : reflectedInfos) {
+            String className = reflectedInfo.getName();
+            LOGGER.info("Load reflection-info(" + className + ") from restlight-core.");
+            reflections.add(new ReflectiveClassBuildItem(false,
+                    false,
+                    Class.forName(className)));
+        }
 
         return reflections;
     }

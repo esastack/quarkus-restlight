@@ -36,6 +36,18 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
+            <groupId>io.esastack</groupId>
+            <artifactId>quarkus-restlight-commons</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.esastack</groupId>
+            <artifactId>restlight-core</artifactId>
+            <version>${restlight.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-junit5-internal</artifactId>
             <scope>test</scope>
