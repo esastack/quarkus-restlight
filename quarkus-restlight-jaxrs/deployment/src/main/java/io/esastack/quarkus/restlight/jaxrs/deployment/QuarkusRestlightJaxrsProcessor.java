@@ -21,7 +21,6 @@ import io.esastack.quarkus.restlight.commons.ReflectedClassInfo;
 import io.esastack.quarkus.restlight.commons.ReflectionInfoUtil;
 import io.esastack.quarkus.restlight.commons.SpiUtil;
 import io.esastack.restlight.jaxrs.impl.JaxrsContextUtils;
-import io.esastack.restlight.server.Restlite;
 import io.quarkus.deployment.annotations.BuildStep;
 import io.quarkus.deployment.builditem.FeatureBuildItem;
 import io.quarkus.deployment.builditem.nativeimage.NativeImageResourceBuildItem;
@@ -65,12 +64,12 @@ class QuarkusRestlightJaxrsProcessor {
     @BuildStep
     List<ReflectiveClassBuildItem> reflections() throws ClassNotFoundException, IOException {
         List<ReflectiveClassBuildItem> reflections = new LinkedList<>();
-        List<ReflectedClassInfo> reflectedInfos = ReflectionInfoUtil.getReflectionConfig(Restlite.class,
-                "META-INF/native-image/io.esastack/restlight-springmvc-provider/" +
-                        "reflection-config.json");
+        List<ReflectedClassInfo> reflectedInfos = ReflectionInfoUtil.getReflectionConfig(
+                JaxrsContextUtils.class, "META-INF/native-image/io.esastack/" +
+                        "restlight-jaxrs-provider/reflection-config.json");
         for (ReflectedClassInfo reflectedInfo : reflectedInfos) {
             String className = reflectedInfo.getName();
-            LOGGER.info("Load reflection-info(" + className + ") from restlight-springmvc-provider.");
+            LOGGER.info("Load reflection-info(" + className + ") from restlight-jaxrs-provider.");
             reflections.add(new ReflectiveClassBuildItem(false,
                     false,
                     Class.forName(className)));
