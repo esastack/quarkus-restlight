@@ -28,7 +28,7 @@ import io.esastack.quarkus.restlight.commons.ReflectedClassInfo;
 import io.esastack.quarkus.restlight.commons.ReflectionInfoUtil;
 import io.esastack.quarkus.restlight.commons.SpiUtil;
 import io.esastack.restlight.core.Restlight;
-import io.esastack.restlight.server.Restlite;
+import io.esastack.restlight.server.BaseRestlightServer;
 import io.quarkus.deployment.annotations.BuildStep;
 import io.quarkus.deployment.builditem.FeatureBuildItem;
 import io.quarkus.deployment.builditem.nativeimage.NativeImageResourceBuildItem;
@@ -56,7 +56,7 @@ class QuarkusRestlightCoreProcessor {
     List<UberJarMergedResourceBuildItem> mergedResources() throws IOException {
         List<UberJarMergedResourceBuildItem> mergedResources = new LinkedList<>();
         Set<String> spiPathSet = new HashSet<>();
-        spiPathSet.addAll(SpiUtil.getAllSpiPaths(Restlite.class));
+        spiPathSet.addAll(SpiUtil.getAllSpiPaths(BaseRestlightServer.class));
         spiPathSet.addAll(SpiUtil.getAllSpiPaths(Restlight.class));
         for (String spiPath : spiPathSet) {
             LOGGER.info("Add mergedResources:" + spiPath);
@@ -103,7 +103,7 @@ class QuarkusRestlightCoreProcessor {
                 "io.esastack.httpserver.impl.RequestDecoder"));
 
         // reflection-configs from restlight-server.
-        List<ReflectedClassInfo> reflectedInfos = ReflectionInfoUtil.getReflectionConfig(Restlite.class,
+        List<ReflectedClassInfo> reflectedInfos = ReflectionInfoUtil.getReflectionConfig(BaseRestlightServer.class,
                 "META-INF/native-image/io.esastack/restlight-server/reflection-config.json");
         for (ReflectedClassInfo reflectedInfo : reflectedInfos) {
             String className = reflectedInfo.getName();
