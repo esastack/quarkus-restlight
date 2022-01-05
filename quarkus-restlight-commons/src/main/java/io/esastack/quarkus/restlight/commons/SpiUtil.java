@@ -9,8 +9,8 @@ import java.util.jar.JarFile;
 
 public final class SpiUtil {
 
-    private static final String ESA_SPI_DIR_PATH = "META-INF/esa";
-    private static final String ESA_INTERNAL_SPI_DIR_PATH = "META-INF/esa/internal";
+    private static final String ESA_SPI_DIR_PATH = "META-INF/esa/";
+    private static final String ESA_INTERNAL_SPI_DIR_PATH = "META-INF/esa/internal/";
 
     private SpiUtil() {
     }
