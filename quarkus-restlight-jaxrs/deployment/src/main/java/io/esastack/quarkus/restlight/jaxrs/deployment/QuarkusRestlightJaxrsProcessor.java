@@ -28,8 +28,10 @@ import io.quarkus.deployment.builditem.nativeimage.ReflectiveClassBuildItem;
 import io.quarkus.deployment.pkg.builditem.UberJarMergedResourceBuildItem;
 
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 class QuarkusRestlightJaxrsProcessor {
 
@@ -63,18 +65,19 @@ class QuarkusRestlightJaxrsProcessor {
 
     @BuildStep
     List<ReflectiveClassBuildItem> reflections() throws ClassNotFoundException, IOException {
-        List<ReflectiveClassBuildItem> reflections = new LinkedList<>();
-        List<ReflectedClassInfo> reflectedInfos = ReflectionInfoUtil.getReflectionConfig(
-                JaxrsContextUtils.class, "META-INF/native-image/io.esastack/" +
-                        "restlight-jaxrs-provider/reflection-config.json");
-        for (ReflectedClassInfo reflectedInfo : reflectedInfos) {
-            String className = reflectedInfo.getName();
-            LOGGER.info("Load reflection-info(" + className + ") from restlight-jaxrs-provider.");
-            reflections.add(new ReflectiveClassBuildItem(false,
-                    false,
-                    Class.forName(className)));
+        Set<String> classNameSet = new HashSet<>();
+
+        // reflection-configs from commons-net-netty.
+        for (ReflectedClassInfo classInfo : ReflectionInfoUtil.loadReflections("restlight-jaxrs-provider",
+                JaxrsContextUtils.class)) {
+            classNameSet.add(classInfo.getName());
         }
 
+        List<ReflectiveClassBuildItem> reflections = new LinkedList<>();
+        for (String className : classNameSet) {
+            LOGGER.info("Load refection(" + className + ") when build quarkus-restlight-jaxrs!");
+            reflections.add(new ReflectiveClassBuildItem(true, true, Class.forName(className)));
+        }
         return reflections;
     }
 }

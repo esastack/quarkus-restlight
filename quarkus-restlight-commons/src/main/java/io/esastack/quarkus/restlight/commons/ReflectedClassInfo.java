@@ -7,6 +7,14 @@ public final class ReflectedClassInfo {
     private String name;
     private List<MethodInfo> methods;
 
+    public ReflectedClassInfo() {
+    }
+
+    public ReflectedClassInfo(String name, List<MethodInfo> methods) {
+        this.name = name;
+        this.methods = methods;
+    }
+
     public String getName() {
         return name;
     }

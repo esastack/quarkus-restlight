@@ -20,9 +20,8 @@ import esa.commons.logging.Logger;
 import esa.commons.logging.LoggerFactory;
 import io.esastack.commons.net.buffer.BufferUtil;
 import io.esastack.commons.net.netty.buffer.NettyBufferAllocatorImpl;
-import io.esastack.commons.net.netty.buffer.NettyBufferProvider;
 import io.esastack.commons.net.netty.buffer.UnpooledNettyBufferAllocator;
-import io.esastack.commons.net.netty.http.NettyCookieProvider;
+import io.esastack.httpserver.HttpServer;
 import io.esastack.httpserver.transport.NioTransport;
 import io.esastack.quarkus.restlight.commons.ReflectedClassInfo;
 import io.esastack.quarkus.restlight.commons.ReflectionInfoUtil;
@@ -58,6 +57,7 @@ class QuarkusRestlightCoreProcessor {
         Set<String> spiPathSet = new HashSet<>();
         spiPathSet.addAll(SpiUtil.getAllSpiPaths(BaseRestlightServer.class));
         spiPathSet.addAll(SpiUtil.getAllSpiPaths(Restlight.class));
+        spiPathSet.addAll(SpiUtil.getAllSpiPaths(UnpooledNettyBufferAllocator.class));
         for (String spiPath : spiPathSet) {
             LOGGER.info("Add mergedResources:" + spiPath);
             mergedResources.add(new UberJarMergedResourceBuildItem(spiPath));
@@ -85,45 +85,37 @@ class QuarkusRestlightCoreProcessor {
 
     @BuildStep
     List<ReflectiveClassBuildItem> reflections() throws IOException, ClassNotFoundException {
-        List<ReflectiveClassBuildItem> reflections = new LinkedList<>();
+        Set<String> classNameSet = new HashSet<>();
 
         // reflection-configs from commons-net-netty.
-        reflections.add(new ReflectiveClassBuildItem(false, false, NettyBufferProvider.class));
-        reflections.add(new ReflectiveClassBuildItem(false, false, UnpooledNettyBufferAllocator.class));
-        reflections.add(new ReflectiveClassBuildItem(false, false, NettyCookieProvider.class));
+        for (ReflectedClassInfo classInfo : ReflectionInfoUtil.loadReflections("commons-net-netty",
+                UnpooledNettyBufferAllocator.class)) {
+            classNameSet.add(classInfo.getName());
+        }
 
         // reflection-configs from esa-httpserver.
-        reflections.add(new ReflectiveClassBuildItem(true, false,
-                "io.esastack.httpserver.impl.Http1Handler"));
-        reflections.add(new ReflectiveClassBuildItem(true, true,
-                "io.esastack.httpserver.impl.HttpServerChannelInitializr"));
-        reflections.add(new ReflectiveClassBuildItem(true, true,
-                "io.esastack.httpserver.impl.OnChannelActiveHandler"));
-        reflections.add(new ReflectiveClassBuildItem(true, true,
-                "io.esastack.httpserver.impl.RequestDecoder"));
+        for (ReflectedClassInfo classInfo : ReflectionInfoUtil.loadReflections("httpserver",
+                HttpServer.class)) {
+            classNameSet.add(classInfo.getName());
+        }
 
         // reflection-configs from restlight-server.
-        List<ReflectedClassInfo> reflectedInfos = ReflectionInfoUtil.getReflectionConfig(BaseRestlightServer.class,
-                "META-INF/native-image/io.esastack/restlight-server/reflection-config.json");
-        for (ReflectedClassInfo reflectedInfo : reflectedInfos) {
-            String className = reflectedInfo.getName();
-            LOGGER.info("Load reflection-info(" + className + ") from restlight-server.");
-            reflections.add(new ReflectiveClassBuildItem(false,
-                    false,
-                    Class.forName(className)));
+        for (ReflectedClassInfo classInfo : ReflectionInfoUtil.loadReflections("restlight-server",
+                BaseRestlightServer.class)) {
+            classNameSet.add(classInfo.getName());
         }
 
         // reflection-configs from restlight-core.
-        reflectedInfos = ReflectionInfoUtil.getReflectionConfig(Restlight.class,
-                "META-INF/native-image/io.esastack/restlight-core/reflection-config.json");
-        for (ReflectedClassInfo reflectedInfo : reflectedInfos) {
-            String className = reflectedInfo.getName();
-            LOGGER.info("Load reflection-info(" + className + ") from restlight-core.");
-            reflections.add(new ReflectiveClassBuildItem(false,
-                    false,
-                    Class.forName(className)));
+        for (ReflectedClassInfo classInfo : ReflectionInfoUtil.loadReflections("restlight-core",
+                Restlight.class)) {
+            classNameSet.add(classInfo.getName());
         }
 
+        List<ReflectiveClassBuildItem> reflections = new LinkedList<>();
+        for (String className : classNameSet) {
+            LOGGER.info("Load refection(" + className + ") when build quarkus-restlight-core!");
+            reflections.add(new ReflectiveClassBuildItem(true, true, Class.forName(className)));
+        }
         return reflections;
     }
 
@@ -149,4 +141,6 @@ class QuarkusRestlightCoreProcessor {
 
         return runtimeInitializedClasses;
     }
+
+
 }
