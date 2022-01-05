@@ -74,7 +74,7 @@ class QuarkusRestlightSpringMvcProcessor {
 
         List<ReflectiveClassBuildItem> reflections = new LinkedList<>();
         for (String className : classNameSet) {
-            LOGGER.info("Load refection(" + className + ") when build quarkus-restlight-springmvc!");
+            LOGGER.info("Load refection(" + className + ") when build quarkus-restlight-springmvc");
             reflections.add(new ReflectiveClassBuildItem(true, true, Class.forName(className)));
         }
         return reflections;

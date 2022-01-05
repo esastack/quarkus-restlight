@@ -113,7 +113,7 @@ class QuarkusRestlightCoreProcessor {
 
         List<ReflectiveClassBuildItem> reflections = new LinkedList<>();
         for (String className : classNameSet) {
-            LOGGER.info("Load refection(" + className + ") when build quarkus-restlight-core!");
+            LOGGER.info("Load refection(" + className + ") when build quarkus-restlight-core");
             reflections.add(new ReflectiveClassBuildItem(true, true, Class.forName(className)));
         }
         return reflections;

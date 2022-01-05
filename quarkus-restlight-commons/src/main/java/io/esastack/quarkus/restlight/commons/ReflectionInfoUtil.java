@@ -25,6 +25,7 @@ public final class ReflectionInfoUtil {
             .getTypeFactory()
             .constructType(new TypeReference<List<ReflectedClassInfo>>() {
             }.getType());
+    private static final String PACKAGE_NAME_OF_RESTLIGHT_SPRING = "io.esastack.restlight.spring.";
 
     private ReflectionInfoUtil() {
     }
@@ -56,8 +57,10 @@ public final class ReflectionInfoUtil {
             BufferedReader reader = new BufferedReader(new InputStreamReader(jar.getInputStream(entry)));
             String className = reader.readLine();
             while (className != null) {
-                ReflectedClassInfo classInfo = new ReflectedClassInfo(className, null);
-                reflectionConfig.add(classInfo);
+                if (!className.startsWith(PACKAGE_NAME_OF_RESTLIGHT_SPRING)) {
+                    ReflectedClassInfo classInfo = new ReflectedClassInfo(className, null);
+                    reflectionConfig.add(classInfo);
+                }
                 className = reader.readLine();
             }
             reader.close();
