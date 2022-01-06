@@ -141,6 +141,4 @@ class QuarkusRestlightCoreProcessor {
 
         return runtimeInitializedClasses;
     }
-
-
 }
