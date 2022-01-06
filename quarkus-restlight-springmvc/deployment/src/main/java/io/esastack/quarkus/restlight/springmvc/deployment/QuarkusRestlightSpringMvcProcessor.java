@@ -65,8 +65,7 @@ class QuarkusRestlightSpringMvcProcessor {
     @BuildStep
     List<ReflectiveClassBuildItem> reflections() throws ClassNotFoundException, IOException {
         Set<String> classNameSet = new HashSet<>();
-
-        // reflection-configs from commons-net-netty.
+        
         for (ReflectedClassInfo classInfo : ReflectionInfoUtil.loadReflections("restlight-springmvc-provider",
                 SpringMvcExceptionResolverFactory.class)) {
             classNameSet.add(classInfo.getName());
