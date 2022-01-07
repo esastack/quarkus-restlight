@@ -1,6 +1,6 @@
 # quarkus-restlight
 
-`quarkus-restlight` is an extension of `esa-restlight`. It can use the `quarkus` framework to help users compile Restlight applications into `native image`, shorten the startup time to milliseconds, and greatly reduce the memory usage, while reducing the image size from 300M+ to 10M.
+`Quarkus-restlight` is an extension of `esa-restlight`. It can use the `quarkus` framework to help users compile Restlight applications into `native image`, shorten the startup time to milliseconds, and greatly reduce the memory usage, while reducing the image size from 300M+ to 10M.
 
 ## Features
 
@@ -155,7 +155,6 @@ public class QuickStart implements QuarkusApplication {
 
     @Override
     public int run(String... args) {
-        final Logger LOG = LoggerFactory.getLogger(QuickStart.class);
         Restlight restlight = Restlight.forServer();
         restlight.deployments().addController(HelloController.class, false);
         restlight.address(9999);
