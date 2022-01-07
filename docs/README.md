@@ -4,7 +4,7 @@
 
 ## Features
 
-Support all functions supported by `esa-restlight`, see details：[esa-restlight](https://www.esastack.io/esa-restlight/)。
+Support all features supported by `esa-restlight`, see details：[esa-restlight](https://www.esastack.io/esa-restlight/)。
 
 ## ENV
 
