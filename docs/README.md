@@ -1,6 +1,6 @@
 # quarkus-restlight
 
-`Quarkus-restlight` is an extension of `esa-restlight`. It can use the `quarkus` framework to help users compile Restlight applications into `native image`, shorten the startup time to milliseconds, and greatly reduce the memory usage, while reducing the image size from 300M+ to 10M.
+`Quarkus-restlight` is an extension of `esa-restlight`. It can use the `quarkus` framework to help users compile `restlight` applications into `native image`, shorten the startup time to milliseconds, and greatly reduce the memory usage, while reducing the image size from 300M+ to 10M.
 
 ## Features
 
