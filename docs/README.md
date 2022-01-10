@@ -1,12 +1,12 @@
-# quarkus-restlight
+# Quarkus-restlight
 
-`Quarkus-restlight` is an extension of `esa-restlight`. It can use the `quarkus` framework to help users compile `restlight` applications into `native image`, shorten the startup time to milliseconds, and greatly reduce the memory usage, while reducing the image size from 300M+ to 10M.
+`Quarkus-restlight` is an extension of `esa-restlight`. It can use the `quarkus` framework to help users compile `restlight` applications into `native image`, shorten the startup time to milliseconds, and greatly reduce the memory usage, while reducing the image size from 100M+ to 10M+.
 
 ## Features
 
 Support all features supported by `esa-restlight`, see details：[esa-restlight](https://www.esastack.io/esa-restlight/)。
 
-## ENV
+## Env
 
 - Java 11+ installed with `JAVA_HOME` configured appropriately.
 - Apache Maven 3.8.1+
