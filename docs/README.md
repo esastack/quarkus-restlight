@@ -177,10 +177,10 @@ After packaging, there will be a file that can be run directly in the `target` d
 
 ## Native Image vs Jar
 
-Pack the code of QuickStart above into ordinary Jar package and `native image`, and compare `native image` and ordinary Jar package:
+Pack the code of QuickStart above into ordinary jar package and `native image`, and compare ordinary jar package and `native image`:
 
 |       Operation mode       |  Jar   |    native image     |
 | :------------------------: | :----: | :-----------------: |
-|            Size            |  49MB  | JDK alone has 200M+ |
+|            Size            |  JDK alone has 200M+  | 49MB |
 |  Time-consuming to start   | 2076ms |        41ms         |
 | Occupies memory at runtime | 327MB  |        33MB         |
