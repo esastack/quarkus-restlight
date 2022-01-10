@@ -18,21 +18,21 @@ public final class SpiUtil {
 
     public static List<String> getAllSpiPaths(Class<?> classInJar) throws IOException {
         checkNotNull(classInJar, "classInJar");
-        final JarFile jar = new JarFile(classInJar.getProtectionDomain().getCodeSource().getLocation().getPath());
-        final Enumeration<JarEntry> entries = jar.entries(); //gives all entries in jar
-        final List<String> spiPaths = new ArrayList<>(12);
-        while (entries.hasMoreElements()) {
-            JarEntry entry = entries.nextElement();
-            final String name = entry.getName();
-            if ((name.startsWith(ESA_SPI_DIR_PATH) || name.startsWith(ESA_INTERNAL_SPI_DIR_PATH))
-                    && !(ESA_SPI_DIR_PATH.equals(name) || ESA_INTERNAL_SPI_DIR_PATH.equals(name))
-                    && !(name.contains(PACKAGE_NAME_OF_RESTLIGHT_SPRING))
-            ) { //filter according to the path
-                spiPaths.add(name);
+        try (JarFile jar = new JarFile(classInJar.getProtectionDomain().getCodeSource().getLocation().getPath())) {
+            final Enumeration<JarEntry> entries = jar.entries(); //gives all entries in jar
+            final List<String> spiPaths = new ArrayList<>(12);
+            while (entries.hasMoreElements()) {
+                JarEntry entry = entries.nextElement();
+                final String name = entry.getName();
+                if ((name.startsWith(ESA_SPI_DIR_PATH) || name.startsWith(ESA_INTERNAL_SPI_DIR_PATH))
+                        && !(ESA_SPI_DIR_PATH.equals(name) || ESA_INTERNAL_SPI_DIR_PATH.equals(name))
+                        && !(name.contains(PACKAGE_NAME_OF_RESTLIGHT_SPRING))
+                ) { //filter according to the path
+                    spiPaths.add(name);
+                }
             }
+            return spiPaths;
         }
-        jar.close();
-        return spiPaths;
     }
 
     private static void checkNotNull(Object obj, String message) {

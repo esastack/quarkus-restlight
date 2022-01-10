@@ -44,25 +44,26 @@ public final class ReflectionInfoUtil {
         checkNotNull(spiPaths, "spiPaths");
 
         String jarPath = classInJar.getProtectionDomain().getCodeSource().getLocation().getPath();
-        final JarFile jar = new JarFile(jarPath);
-        List<ReflectedClassInfo> reflectionConfig = new ArrayList<>(12);
+        try (JarFile jar = new JarFile(jarPath)) {
+            List<ReflectedClassInfo> reflectionConfig = new ArrayList<>(12);
 
-        for (String spiPath : spiPaths) {
-            ZipEntry entry = jar.getEntry(spiPath);
-            if (entry == null) {
-                throw new IllegalStateException(spiPath + " is not exist in jar(" + jarPath + ")!");
-            }
+            for (String spiPath : spiPaths) {
+                ZipEntry entry = jar.getEntry(spiPath);
+                if (entry == null) {
+                    throw new IllegalStateException(spiPath + " is not exist in jar(" + jarPath + ")!");
+                }
 
-            BufferedReader reader = new BufferedReader(new InputStreamReader(jar.getInputStream(entry)));
-            String className = reader.readLine();
-            while (className != null) {
-                ReflectedClassInfo classInfo = new ReflectedClassInfo(className, null);
-                reflectionConfig.add(classInfo);
-                className = reader.readLine();
+                try (BufferedReader reader = new BufferedReader(new InputStreamReader(jar.getInputStream(entry)))) {
+                    String className = reader.readLine();
+                    while (className != null) {
+                        ReflectedClassInfo classInfo = new ReflectedClassInfo(className, null);
+                        reflectionConfig.add(classInfo);
+                        className = reader.readLine();
+                    }
+                }
             }
-            reader.close();
+            return reflectionConfig;
         }
-        return reflectionConfig;
     }
 
     private static List<ReflectedClassInfo> loadReflectionsByJson(Class<?> classInJar, String reflectionConfigPath)
@@ -71,17 +72,17 @@ public final class ReflectionInfoUtil {
         checkNotNull(reflectionConfigPath, "reflectionConfigPath");
 
         String jarPath = classInJar.getProtectionDomain().getCodeSource().getLocation().getPath();
-        final JarFile jar = new JarFile(jarPath);
-        ZipEntry entry = jar.getEntry(reflectionConfigPath);
-        if (entry == null) {
-            throw new IllegalStateException(reflectionConfigPath + " is not exist in jar(" + jarPath + ")!");
-        }
+        try (JarFile jar = new JarFile(jarPath)) {
+            ZipEntry entry = jar.getEntry(reflectionConfigPath);
+            if (entry == null) {
+                throw new IllegalStateException(reflectionConfigPath + " is not exist in jar(" + jarPath + ")!");
+            }
 
-        InputStream reflectionStream = jar.getInputStream(entry);
-        List<ReflectedClassInfo> reflectionConfig = DEFAULT_OBJECT_MAPPER.readValue(reflectionStream.readAllBytes(),
-                REFLECTION_CONFIG_TYPE);
-        reflectionStream.close();
-        return reflectionConfig;
+            try (InputStream reflectionStream = jar.getInputStream(entry)) {
+                return DEFAULT_OBJECT_MAPPER.readValue(reflectionStream.readAllBytes(),
+                        REFLECTION_CONFIG_TYPE);
+            }
+        }
     }
 
     private static ObjectMapper initDefaultMapper() {
