@@ -66,8 +66,8 @@ class QuarkusRestlightSpringMvcProcessor {
     List<ReflectiveClassBuildItem> reflections() throws ClassNotFoundException, IOException {
         Set<String> classNameSet = new HashSet<>();
         
-        for (ReflectedClassInfo classInfo : ReflectionInfoUtil.loadReflections("restlight-springmvc-provider",
-                SpringMvcExceptionResolverFactory.class)) {
+        for (ReflectedClassInfo classInfo : ReflectionInfoUtil.loadReflections(
+                "restlight-springmvc-provider", SpringMvcExceptionResolverFactory.class)) {
             classNameSet.add(classInfo.getName());
         }
 
