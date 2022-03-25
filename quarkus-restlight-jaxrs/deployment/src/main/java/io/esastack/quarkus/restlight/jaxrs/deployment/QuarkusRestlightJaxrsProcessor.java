@@ -67,8 +67,8 @@ class QuarkusRestlightJaxrsProcessor {
     List<ReflectiveClassBuildItem> reflections() throws ClassNotFoundException, IOException {
         Set<String> classNameSet = new HashSet<>();
 
-        for (ReflectedClassInfo classInfo : ReflectionInfoUtil.loadReflections("restlight-jaxrs-provider",
-                JaxrsContextUtils.class)) {
+        for (ReflectedClassInfo classInfo : ReflectionInfoUtil.loadReflections(
+                "restlight-jaxrs-provider", JaxrsContextUtils.class)) {
             classNameSet.add(classInfo.getName());
         }
 

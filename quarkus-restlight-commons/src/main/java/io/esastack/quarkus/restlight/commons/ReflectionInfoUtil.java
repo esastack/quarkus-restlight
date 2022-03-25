@@ -19,6 +19,7 @@ import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
 
 public final class ReflectionInfoUtil {
+
     private static final String yyyyMMddHHmmss = "yyyy-MM-dd HH:mm:ss";
     private static ObjectMapper DEFAULT_OBJECT_MAPPER = initDefaultMapper();
     private static final JavaType REFLECTION_CONFIG_TYPE = DEFAULT_OBJECT_MAPPER
